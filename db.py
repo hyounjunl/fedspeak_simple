@@ -59,7 +59,7 @@ def get_next_unlabeled_qna():
             'question': row[2],
             'responder': row[3],
             'response': row[4],
-            'date': row[5].strftime('%Y-%m-%d') if row[5] else None,
+            'date': row[5],  # Use the date directly without formatting
             'filename': row[6]
         }
         
@@ -68,6 +68,7 @@ def get_next_unlabeled_qna():
         cursor.close()
         conn.close()
 
+        
 def label_qna(qna_id, label_value, user_id):
     """Label a QnA pair and record the user who labeled it"""
     conn = get_db_connection()
