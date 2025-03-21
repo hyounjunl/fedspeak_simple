@@ -22,15 +22,18 @@ def label():
     if 'user_id' not in session:
         return redirect(url_for('index'))
     
-    # Get user's labeling statistics
+    # Get user's labeling statistics with robust error handling
+    stats = {
+        'user': {'total': 0, 'relevant': 0, 'irrelevant': 0},
+        'overall': {'total': 1, 'labeled': 0, 'unlabeled': 1}
+    }
+    
     try:
-        stats = get_user_stats(session['user_id'])
+        db_stats = get_user_stats(session['user_id'])
+        if db_stats:
+            stats = db_stats
     except Exception as e:
         print(f"Error getting stats: {e}")
-        stats = {
-            'user': {'total': 0, 'relevant': 0, 'irrelevant': 0},
-            'overall': {'total': 1, 'labeled': 0, 'unlabeled': 1}  # Use 1 to avoid division by zero
-        }
     
     return render_template('label.html', 
                           user_id=session['user_id'], 
