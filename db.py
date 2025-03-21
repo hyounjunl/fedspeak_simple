@@ -43,7 +43,7 @@ def get_next_unlabeled_qna():
             FROM fomc_qna q
             JOIN fomc_statements s ON q.statement_id = s.id
             WHERE q.is_labeled IS NOT TRUE OR q.is_labeled IS NULL
-            ORDER BY RANDOM() -- Randomize to distribute workload among users
+            ORDER BY RANDOM()
             LIMIT 1
         """)
         
