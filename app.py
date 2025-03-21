@@ -29,7 +29,7 @@ def label():
         print(f"Error getting stats: {e}")
         stats = {
             'user': {'total': 0, 'relevant': 0, 'irrelevant': 0},
-            'overall': {'total': 0, 'labeled': 0, 'unlabeled': 0}
+            'overall': {'total': 1, 'labeled': 0, 'unlabeled': 1}  # Use 1 to avoid division by zero
         }
     
     return render_template('label.html', 

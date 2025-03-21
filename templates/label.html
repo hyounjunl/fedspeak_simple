@@ -175,7 +175,7 @@
                                 <div class="flex justify-between text-sm mb-1">
                                     <span class="text-gray-500">Total Progress</span>
                                     <span class="text-gray-800 font-medium" id="progress-percentage">
-                                        {{ (stats.overall.labeled / stats.overall.total * 100) | round(1) }}%
+                                        {{ ((stats.overall.labeled / stats.overall.total * 100) if stats.overall.total > 0 else 0) | round(1) }}%
                                     </span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2.5">
