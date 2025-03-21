@@ -42,7 +42,7 @@ def get_next_unlabeled_qna():
                    s.date, s.filename
             FROM fomc_qna q
             JOIN fomc_statements s ON q.statement_id = s.id
-            WHERE q.is_labeled = FALSE
+            WHERE q.is_labeled = 'false'::boolean OR q.is_labeled IS NULL
             ORDER BY RANDOM() -- Randomize to distribute workload among users
             LIMIT 1
         """)
@@ -77,8 +77,8 @@ def label_qna(qna_id, label_value, user_id):
         # Update the QnA record with label and user info
         cursor.execute("""
             UPDATE fomc_qna
-            SET is_labeled = TRUE, 
-                label = %s,
+            SET is_labeled = 'true'::boolean, 
+                label = %s::boolean,
                 labeled_by = %s,
                 labeled_at = NOW()
             WHERE id = %s
@@ -86,7 +86,7 @@ def label_qna(qna_id, label_value, user_id):
         
         # Get the number of remaining unlabeled QnAs
         cursor.execute("""
-            SELECT COUNT(*) FROM fomc_qna WHERE is_labeled = FALSE
+            SELECT COUNT(*) FROM fomc_qna WHERE is_labeled = 'false'::boolean OR is_labeled IS NULL
         """)
         remaining = cursor.fetchone()[0]
         
@@ -121,17 +121,17 @@ def get_user_stats(user_id):
         """, (user_id,))
         total = cursor.fetchone()[0]
         
-        # Get relevant count
+        # Get relevant count - Fix boolean comparison
         cursor.execute("""
             SELECT COUNT(*) FROM fomc_qna 
-            WHERE labeled_by = %s AND label = TRUE
+            WHERE labeled_by = %s AND label = 'true'::boolean
         """, (user_id,))
         relevant = cursor.fetchone()[0]
         
-        # Get irrelevant count
+        # Get irrelevant count - Fix boolean comparison
         cursor.execute("""
             SELECT COUNT(*) FROM fomc_qna 
-            WHERE labeled_by = %s AND label = FALSE
+            WHERE labeled_by = %s AND label = 'false'::boolean
         """, (user_id,))
         irrelevant = cursor.fetchone()[0]
         
@@ -139,8 +139,8 @@ def get_user_stats(user_id):
         cursor.execute("""
             SELECT 
                 COUNT(*) as total,
-                COUNT(*) FILTER (WHERE is_labeled = TRUE) as labeled,
-                COUNT(*) FILTER (WHERE is_labeled = FALSE) as unlabeled
+                COUNT(*) FILTER (WHERE is_labeled = 'true'::boolean) as labeled,
+                COUNT(*) FILTER (WHERE is_labeled = 'false'::boolean OR is_labeled IS NULL) as unlabeled
             FROM fomc_qna
         """)
         overall = cursor.fetchone()
